@@ -2,15 +2,15 @@ spring:
   profiles:
     active: test
 ---
-spring:
-  profiles: dev
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/test
-    username: postgres
-    password: postgres
-logging:
-  level:
-    org.springframework.data.r2dbc: Debug
+#spring:
+#  profiles: dev
+#  r2dbc:
+#    url: r2dbc:postgresql://localhost:5432/test
+#    username: postgres
+#    password: postgres
+#logging:
+#  level:
+#    org.springframework.data.r2dbc: Debug
 ---
 spring:
   profiles: test

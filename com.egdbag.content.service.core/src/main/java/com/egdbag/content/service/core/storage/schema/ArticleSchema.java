@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,5 +16,6 @@ public class ArticleSchema {
     @Id
     private Integer id;
     private String title;
-    private Instant ts;
+    private String timestamps;
+    private String hashtags;
 }

@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.net.URI;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("articles")
@@ -30,17 +28,7 @@ class ArticlesController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
     Flux<Article> getAll() {
-        return articleService.getAllArticles().flatMap(article -> {
-            List<Component> components = new ArrayList<>();
-            return textComponentService.getComponentsByArticleId(article.getId())
-                    .map(component -> {
-                        components.add(component);
-                        return component;
-                    }).then(Mono.just(components).map(cs -> {
-                        article.setComponents(cs);
-                        return article;
-                    }));
-                });
+        return articleService.getAllArticles();
     }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,7 +42,7 @@ class ArticlesController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "201")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
-            @ExampleObject(value = "{\"title\":\"Test article\"}")
+            @ExampleObject(value = "{\"title\":\"Test article\", \"hashTags\":[\"test1\", \"test2\"]}")
     }))
     Mono<ResponseEntity<URI>> create(@RequestBody Article article) {
         return articleService.createArticle(article)

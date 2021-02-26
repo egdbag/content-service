@@ -47,24 +47,4 @@ public class TextComponentService implements ITextComponentService {
     public Flux<TextComponent> getComponentsByArticleId(Integer articleId) {
         return textComponentRepository.findByArticleId(articleId).map(modelMapper::toDto);
     }
-
-    //
-//    private Mono<Department> getDepartmentByUserId(Integer userId) {
-//        return departmentRepository.findByUserId(userId);
-//    }
-//
-//    public Mono<UserDepartmentDTO> fetchUserAndDepartment(Integer userId) {
-//        Mono<User> user = findById(userId).subscribeOn(Schedulers.elastic());
-//        Mono<Department> department = getDepartmentByUserId(userId).subscribeOn(Schedulers.elastic());
-//        return Mono.zip(user, department, userDepartmentDTOBiFunction);
-//    }
-//
-//    private BiFunction<User, Department, UserDepartmentDTO> userDepartmentDTOBiFunction = (x1, x2) -> UserDepartmentDTO.builder()
-//            .age(x1.getAge())
-//            .departmentId(x2.getId())
-//            .departmentName(x2.getName())
-//            .userName(x1.getName())
-//            .userId(x1.getId())
-//            .loc(x2.getLoc())
-//            .salary(x1.getSalary()).build();
 }
