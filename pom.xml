@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>com.egdbag.article.web</module>
-        <module>com.egdbag.article.core</module>
+        <module>com.egdbag.content.service.web</module>
+        <module>com.egdbag.content.service.core</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -14,9 +14,9 @@
         <relativePath/>
     </parent>
     <groupId>com.egdbag</groupId>
-    <artifactId>com.egdbag.article</artifactId>
+    <artifactId>com.egdbag.content.service</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>Article Backend</name>
+    <name>Content service</name>
 
     <properties>
         <java.version>11</java.version>
@@ -24,22 +24,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>compile</scope>
         </dependency>
     </dependencies>
 
+
     <build>
-        <defaultGoal>spring-boot:run</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
