@@ -1,6 +1,7 @@
 package com.egdbag.content.service.web.controllers;
 
 import com.egdbag.content.service.core.interfaces.*;
+import com.egdbag.content.service.core.model.survey.Answer;
 import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -24,6 +26,14 @@ class SurveyComponentController {
     private IQuestionService questionService;
     @Autowired
     private IOptionService optionService;
+    @Autowired
+    private IAnswerService answerService;
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
+    Flux<SurveyComponent> getAll() {
+        return surveyComponentService.getAllComponents();
+    }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
@@ -118,6 +128,42 @@ class SurveyComponentController {
     @ApiResponse(responseCode = "204")
     Mono<ResponseEntity<Void>> deleteOptionById(@PathVariable Integer id) {
         return optionService.deleteOption(id)
+                .map( r -> ResponseEntity.ok().<Void>build())
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping(path = "/questions/{questionId}/answers", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "201")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
+            @ExampleObject(value = "{\"options\": [ 1, 2, 3]}")
+    }))
+    Mono<ResponseEntity<Object>> createAnswer(@PathVariable Integer questionId, @RequestBody Answer answer) {
+        return questionService.findById(questionId)
+                .flatMap(c -> answerService.createAnswer(answer, 1, questionId)
+                        .map(o ->ResponseEntity.created(URI.create("/answers/" + o.getId())).build()))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(path = "/questions/answers/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
+    Mono<ResponseEntity<Answer>> getAnswerById(@PathVariable("id") Integer id) {
+        return  answerService.findById(id)
+                .map(u -> ResponseEntity.ok(u))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping(path = "/questions/answers/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
+    Mono<ResponseEntity<Answer>> updateAnswerById(@PathVariable Integer id, @RequestBody Answer answer) {
+        return answerService.updateAnswer(id, answer)
+                .map(updated -> ResponseEntity.ok(updated))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @DeleteMapping("/questions/answers/{id}")
+    @ApiResponse(responseCode = "204")
+    Mono<ResponseEntity<Void>> deleteAnswerById(@PathVariable Integer id) {
+        return answerService.deleteAnswer(id)
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }

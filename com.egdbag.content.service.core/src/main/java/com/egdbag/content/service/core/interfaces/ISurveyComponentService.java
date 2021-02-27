@@ -5,6 +5,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface ISurveyComponentService {
+    Flux<SurveyComponent> getAllComponents();
+
     Mono<SurveyComponent> createComponent(SurveyComponent component, Integer articleId);
 
     Mono<SurveyComponent> findById(Integer componentId);

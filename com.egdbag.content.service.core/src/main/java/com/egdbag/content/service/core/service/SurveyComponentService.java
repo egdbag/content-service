@@ -26,6 +26,12 @@ public class SurveyComponentService implements ISurveyComponentService {
     ModelMapper modelMapper;
 
     @Override
+    public Flux<SurveyComponent> getAllComponents() {
+        return surveyComponentRepository.findAll()
+                .flatMap(this::convertToFullDto);
+    }
+
+    @Override
     public Mono<SurveyComponent> createComponent(SurveyComponent component, Integer articleId) {
         SurveyComponentSchema componentSchema = modelMapper.toSchema(component, articleId);
         return surveyComponentRepository.save(componentSchema)

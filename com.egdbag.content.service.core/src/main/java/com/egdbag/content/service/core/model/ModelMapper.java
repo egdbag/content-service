@@ -1,11 +1,13 @@
 package com.egdbag.content.service.core.model;
 
+import com.egdbag.content.service.core.model.survey.Answer;
 import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
 import com.egdbag.content.service.core.storage.schema.ArticleSchema;
 import com.egdbag.content.service.core.storage.schema.ImageComponentSchema;
 import com.egdbag.content.service.core.storage.schema.TextComponentSchema;
+import com.egdbag.content.service.core.storage.schema.survey.AnswerSchema;
 import com.egdbag.content.service.core.storage.schema.survey.OptionSchema;
 import com.egdbag.content.service.core.storage.schema.survey.QuestionSchema;
 import com.egdbag.content.service.core.storage.schema.survey.SurveyComponentSchema;
@@ -130,6 +132,40 @@ public class ModelMapper {
                 .text(option.getText())
                 .questionId(questionId)
                 .build();
+    }
+
+    public Answer toDto(AnswerSchema answerSchema)
+    {
+        return Answer.builder()
+                .id(answerSchema.getId())
+                .userId(answerSchema.getUserId())
+                .questionId(answerSchema.getQuestionId())
+                .optionIds(splitOptions(answerSchema.getOptionIds()))
+                .build();
+    }
+
+    public AnswerSchema toSchema(Answer answer, Integer userId, Integer questionId)
+    {
+        return AnswerSchema.builder()
+                .questionId(questionId)
+                .userId(userId)
+                .optionIds(concatenateOptions(answer.getOptionIds()))
+                .build();
+    }
+
+    public String concatenateOptions(List<Integer> optionIds)
+    {
+        return optionIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+    }
+
+    private List<Integer> splitOptions(String optionIds)
+    {
+        return Arrays.asList(optionIds.split(","))
+                .stream()
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
     }
 
     private Set<String> splitHashTags(String hashtags)
