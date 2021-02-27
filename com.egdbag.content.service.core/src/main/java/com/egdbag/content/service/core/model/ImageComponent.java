@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.net.URI;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -14,5 +16,5 @@ import lombok.NoArgsConstructor;
 public class ImageComponent extends Component {
     private transient final String type = "IMAGE";
     private Integer id;
-    private String url;
+    private URI uri;
 }

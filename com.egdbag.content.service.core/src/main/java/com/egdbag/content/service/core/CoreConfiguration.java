@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.r2dbc.connection.init.CompositeDatabasePopulator;
 import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer;
 import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @ComponentScan
@@ -21,5 +22,11 @@ public class CoreConfiguration {
         populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
         initializer.setDatabasePopulator(populator);
         return initializer;
+    }
+
+    @Bean
+    public WebClient webCLient()
+    {
+        return WebClient.builder().build();
     }
 }

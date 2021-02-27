@@ -1,6 +1,7 @@
 package com.egdbag.content.service.core.service;
 
 import com.egdbag.content.service.core.interfaces.IArticleService;
+import com.egdbag.content.service.core.interfaces.IImageComponentService;
 import com.egdbag.content.service.core.interfaces.ISurveyComponentService;
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
 import com.egdbag.content.service.core.model.Article;
@@ -24,6 +25,8 @@ public class ArticleService implements IArticleService {
     private ITextComponentService textComponentService;
     @Autowired
     private ISurveyComponentService surveyComponentService;
+    @Autowired
+    private IImageComponentService imageComponentService;
     @Autowired
     ModelMapper modelMapper;
 
@@ -65,6 +68,7 @@ public class ArticleService implements IArticleService {
     private Mono<Article> convertToFullDto(ArticleSchema article) {
         return Flux.fromIterable(new ArrayList<Component>())
                 .concatWith(textComponentService.getComponentsByArticleId(article.getId()))
+                .concatWith(imageComponentService.getComponentsByArticleId(article.getId()))
                 .concatWith(surveyComponentService.getComponentsByArticleId(article.getId()))
                 .collectList()
                 .map(components -> modelMapper.toDto(article, new ArrayList<>(components)));

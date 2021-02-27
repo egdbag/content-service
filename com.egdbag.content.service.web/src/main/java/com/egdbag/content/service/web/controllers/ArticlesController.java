@@ -1,10 +1,12 @@
 package com.egdbag.content.service.web.controllers;
 
+import com.egdbag.content.service.core.interfaces.IImageComponentService;
 import com.egdbag.content.service.core.interfaces.ISurveyComponentService;
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
 import com.egdbag.content.service.core.model.Article;
 import com.egdbag.content.service.core.model.Component;
 import com.egdbag.content.service.core.interfaces.IArticleService;
+import com.egdbag.content.service.core.model.ImageComponent;
 import com.egdbag.content.service.core.model.TextComponent;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +28,8 @@ class ArticlesController {
     private IArticleService articleService;
     @Autowired
     private ITextComponentService textComponentService;
+    @Autowired
+    private IImageComponentService imageComponentService;
     @Autowired
     private ISurveyComponentService surveyComponentService;
 
@@ -86,6 +90,10 @@ class ArticlesController {
             else if (component instanceof SurveyComponent) {
                 return surveyComponentService.createComponent((SurveyComponent) component, id)
                         .map(c -> ResponseEntity.created(URI.create("/components/survey/" + c.getId())).build());
+            }
+            else if (component instanceof ImageComponent) {
+                return imageComponentService.createComponent((ImageComponent) component, id)
+                        .map(c -> ResponseEntity.created(URI.create("/components/image/" + c.getId())).build());
             }
             else {
                 return Mono.just(ResponseEntity.badRequest().build());

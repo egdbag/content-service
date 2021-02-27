@@ -1,18 +1,17 @@
 package com.egdbag.content.service.core.model;
 
-import com.egdbag.content.service.core.model.Article;
-import com.egdbag.content.service.core.model.Component;
-import com.egdbag.content.service.core.model.TextComponent;
 import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
 import com.egdbag.content.service.core.storage.schema.ArticleSchema;
+import com.egdbag.content.service.core.storage.schema.ImageComponentSchema;
 import com.egdbag.content.service.core.storage.schema.TextComponentSchema;
 import com.egdbag.content.service.core.storage.schema.survey.OptionSchema;
 import com.egdbag.content.service.core.storage.schema.survey.QuestionSchema;
 import com.egdbag.content.service.core.storage.schema.survey.SurveyComponentSchema;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +54,21 @@ public class ModelMapper {
     {
         return TextComponentSchema.builder()
                 .text(textComponent.getText())
+                .articleId(articleId)
+                .build();
+    }
+
+    public ImageComponent toDto(ImageComponentSchema imageComponent)
+    {
+        return ImageComponent.builder().id(imageComponent.getId())
+                .uri(URI.create(imageComponent.getUri()))
+                .build();
+    }
+
+    public ImageComponentSchema toSchema(ImageComponent imageComponent, Integer articleId)
+    {
+        return ImageComponentSchema.builder()
+                .uri(imageComponent.getUri().toString())
                 .articleId(articleId)
                 .build();
     }
