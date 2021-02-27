@@ -5,6 +5,7 @@ import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
 import com.egdbag.content.service.core.storage.schema.ArticleSchema;
+import com.egdbag.content.service.core.storage.schema.CommentSchema;
 import com.egdbag.content.service.core.storage.schema.ImageComponentSchema;
 import com.egdbag.content.service.core.storage.schema.TextComponentSchema;
 import com.egdbag.content.service.core.storage.schema.survey.AnswerSchema;
@@ -47,8 +48,14 @@ public class ModelMapper {
 
     public TextComponent toDto(TextComponentSchema textComponent)
     {
+        return toDto(textComponent, null);
+    }
+
+    public TextComponent toDto(TextComponentSchema textComponent, List<Comment> comments)
+    {
         return TextComponent.builder().id(textComponent.getId())
                 .text(textComponent.getText())
+                .comments(comments)
                 .build();
     }
 
@@ -139,7 +146,6 @@ public class ModelMapper {
         return Answer.builder()
                 .id(answerSchema.getId())
                 .userId(answerSchema.getUserId())
-                .questionId(answerSchema.getQuestionId())
                 .optionIds(splitOptions(answerSchema.getOptionIds()))
                 .build();
     }
@@ -150,6 +156,29 @@ public class ModelMapper {
                 .questionId(questionId)
                 .userId(userId)
                 .optionIds(concatenateOptions(answer.getOptionIds()))
+                .build();
+    }
+
+    public Comment toDto(CommentSchema commentSchema)
+    {
+        return Comment.builder()
+                .id(commentSchema.getId())
+                .userId(commentSchema.getUserId())
+                .timestamp(commentSchema.getTs().getEpochSecond())
+                .beginIndex(commentSchema.getBeginIndex())
+                .endIndex(commentSchema.getEndIndex())
+                .text(commentSchema.getText())
+                .build();
+    }
+
+    public CommentSchema toSchema(Comment answer, Integer userId, Integer textComponentId)
+    {
+        return CommentSchema.builder()
+                .userId(userId)
+                .textComponentId(textComponentId)
+                .text(answer.getText())
+                .beginIndex(answer.getBeginIndex())
+                .endIndex(answer.getEndIndex())
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.egdbag.content.service.core.service;
 
+import com.egdbag.content.service.core.interfaces.ICommentService;
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
 import com.egdbag.content.service.core.model.ModelMapper;
 import com.egdbag.content.service.core.model.TextComponent;
@@ -10,10 +11,14 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+
 @Service
 public class TextComponentService implements ITextComponentService {
     @Autowired
     private ITextComponentRepository textComponentRepository;
+    @Autowired
+    private ICommentService commentService;
     @Autowired
     ModelMapper modelMapper;
 
@@ -51,5 +56,11 @@ public class TextComponentService implements ITextComponentService {
     public Flux<TextComponent> getComponentsByArticleId(Integer articleId) {
         return textComponentRepository.findByArticleId(articleId)
                 .map(modelMapper::toDto);
+    }
+
+    private Mono<TextComponent> convertToFullDto(TextComponentSchema textComponent) {
+        return commentService.getCommentsByTextComponentId(textComponent.getId())
+                .collectList()
+                .map(comments -> modelMapper.toDto(textComponent, new ArrayList<>(comments)));
     }
 }
