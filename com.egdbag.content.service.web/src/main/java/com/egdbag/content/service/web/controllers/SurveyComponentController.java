@@ -5,6 +5,7 @@ import com.egdbag.content.service.core.model.survey.Answer;
 import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,6 +29,8 @@ class SurveyComponentController {
     private IOptionService optionService;
     @Autowired
     private IAnswerService answerService;
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
@@ -96,7 +99,7 @@ class SurveyComponentController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @PostMapping(path = "/questions/{questionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/questions/{questionId}/options", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "201")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
             @ExampleObject(value = "{\"text\": \"yes\"}")
@@ -135,11 +138,18 @@ class SurveyComponentController {
     @PostMapping(path = "/questions/{questionId}/answers", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "201")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
-            @ExampleObject(value = "{\"options\": [ 1, 2, 3]}")
+            @ExampleObject(value = "{\"optionIds\": [ 1, 2, 3]}")
     }))
     Mono<ResponseEntity<Object>> createAnswer(@PathVariable Integer questionId, @RequestBody Answer answer) {
         return questionService.findById(questionId)
-                .flatMap(c -> answerService.createAnswer(answer, 1, questionId)
+                .flatMap(q -> answerService.createAnswer(answer, 1, questionId)
+                        .map(a -> {
+                            for (Integer optionId : answer.getOptionIds())
+                            {
+                                optionService.findById(optionId).subscribe(option -> incrementAnswerCounter(questionId, optionId, q.getText(), option.getText()));
+                            }
+                            return a;
+                        })
                         .map(o ->ResponseEntity.created(URI.create("/answers/" + o.getId())).build()))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -166,5 +176,11 @@ class SurveyComponentController {
         return answerService.deleteAnswer(id)
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    private void incrementAnswerCounter(Integer questionId, Integer optionId, String questionText, String answerText) {
+        meterRegistry.counter("question." + questionId + ".option." + optionId,
+                "question", questionText, "option", answerText)
+                .increment();
     }
 }

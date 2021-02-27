@@ -20,5 +20,6 @@ public class AnswerSchema {
     private Integer userId;
     @Column("question_id")
     private Integer questionId;
+    @Column("option_ids")
     private String optionIds;
 }

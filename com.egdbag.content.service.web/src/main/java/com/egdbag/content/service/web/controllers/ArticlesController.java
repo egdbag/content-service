@@ -9,6 +9,8 @@ import com.egdbag.content.service.core.interfaces.IArticleService;
 import com.egdbag.content.service.core.model.ImageComponent;
 import com.egdbag.content.service.core.model.TextComponent;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,6 +35,9 @@ class ArticlesController {
     @Autowired
     private ISurveyComponentService surveyComponentService;
 
+    @Autowired
+    private MeterRegistry meterRegistry;
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
     Flux<Article> getAll() {
@@ -47,10 +52,18 @@ class ArticlesController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @GetMapping(path = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    @ApiResponse(responseCode = "200")
+    Mono<ResponseEntity<String>> getAsHtml(@PathVariable("id") Integer id) {
+        articleService.findById(id)
+                .subscribe(article -> incrementViewCounter(id, article.getTitle()));
+        return Mono.just(ResponseEntity.ok("<p>Welcome to the jungle\n We got fun 'n' games</p>"));
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "201")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
-            @ExampleObject(value = "{\"title\":\"Test article\", \"hashTags\":[\"test1\", \"test2\"]}")
+            @ExampleObject(value = "{\"title\":\"Test article\", \"hashtags\":[\"test1\", \"test2\"]}")
     }))
     Mono<ResponseEntity<URI>> create(@RequestBody Article article) {
         return articleService.createArticle(article)
@@ -100,5 +113,10 @@ class ArticlesController {
             }
         })
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    private void incrementViewCounter(Integer articleId, String title) {
+        meterRegistry.counter("article." + articleId + ".views", "articleTitle", title)
+                .increment();
     }
 }
