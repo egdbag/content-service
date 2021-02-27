@@ -1,6 +1,7 @@
 package com.egdbag.content.service.core.service;
 
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
+import com.egdbag.content.service.core.model.ModelMapper;
 import com.egdbag.content.service.core.model.TextComponent;
 import com.egdbag.content.service.core.storage.repository.ITextComponentRepository;
 import com.egdbag.content.service.core.storage.schema.TextComponentSchema;
@@ -13,17 +14,20 @@ import reactor.core.publisher.Mono;
 public class TextComponentService implements ITextComponentService {
     @Autowired
     private ITextComponentRepository textComponentRepository;
-    @Autowired ModelMapper modelMapper;
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
     public Mono<TextComponent> createComponent(TextComponent component, Integer articleId) {
         TextComponentSchema componentSchema = modelMapper.toSchema(component, articleId);
-        return textComponentRepository.save(componentSchema).map(modelMapper::toDto);
+        return textComponentRepository.save(componentSchema)
+                .map(modelMapper::toDto);
     }
 
     @Override
     public Mono<TextComponent> findById(Integer componentId) {
-        return textComponentRepository.findById(componentId).map(modelMapper::toDto);
+        return textComponentRepository.findById(componentId)
+                .map(modelMapper::toDto);
     }
 
     @Override
@@ -45,6 +49,7 @@ public class TextComponentService implements ITextComponentService {
 
     @Override
     public Flux<TextComponent> getComponentsByArticleId(Integer articleId) {
-        return textComponentRepository.findByArticleId(articleId).map(modelMapper::toDto);
+        return textComponentRepository.findByArticleId(articleId)
+                .map(modelMapper::toDto);
     }
 }

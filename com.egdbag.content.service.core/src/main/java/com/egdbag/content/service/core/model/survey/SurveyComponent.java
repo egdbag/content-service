@@ -17,5 +17,6 @@ import java.util.List;
 public class SurveyComponent extends Component {
     private transient final String type = "SURVEY";
     private Integer id;
+    private String text;
     private List<Question> questions;
 }

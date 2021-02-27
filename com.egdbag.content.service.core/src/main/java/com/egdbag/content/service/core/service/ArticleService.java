@@ -1,8 +1,11 @@
 package com.egdbag.content.service.core.service;
 
 import com.egdbag.content.service.core.interfaces.IArticleService;
+import com.egdbag.content.service.core.interfaces.ISurveyComponentService;
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
 import com.egdbag.content.service.core.model.Article;
+import com.egdbag.content.service.core.model.Component;
+import com.egdbag.content.service.core.model.ModelMapper;
 import com.egdbag.content.service.core.storage.repository.IArticleRepository;
 import com.egdbag.content.service.core.storage.schema.ArticleSchema;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +22,10 @@ public class ArticleService implements IArticleService {
     private IArticleRepository articleRepository;
     @Autowired
     private ITextComponentService textComponentService;
-    @Autowired ModelMapper modelMapper;
+    @Autowired
+    private ISurveyComponentService surveyComponentService;
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
     public Mono<Article> createArticle(Article article) {
@@ -56,15 +62,15 @@ public class ArticleService implements IArticleService {
                         .then(Mono.just(modelMapper.toDto(existingArticle))));
     }
 
-    private Mono<Article> convertToFullDto(ArticleSchema article)
-    {
-        return textComponentService.getComponentsByArticleId(article.getId())
+    private Mono<Article> convertToFullDto(ArticleSchema article) {
+        return Flux.fromIterable(new ArrayList<Component>())
+                .concatWith(textComponentService.getComponentsByArticleId(article.getId()))
+                .concatWith(surveyComponentService.getComponentsByArticleId(article.getId()))
                 .collectList()
                 .map(components -> modelMapper.toDto(article, new ArrayList<>(components)));
     }
 
-    private String getCurrentTimestamp()
-    {
+    private String getCurrentTimestamp() {
         return Long.toString(Instant.now().getEpochSecond());
     }
 }
