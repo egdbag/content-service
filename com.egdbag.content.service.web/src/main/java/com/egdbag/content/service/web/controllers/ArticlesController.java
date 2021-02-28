@@ -9,7 +9,6 @@ import com.egdbag.content.service.core.interfaces.IArticleService;
 import com.egdbag.content.service.core.model.ImageComponent;
 import com.egdbag.content.service.core.model.TextComponent;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -17,13 +16,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.result.view.Rendering;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
-@RestController
+@Controller
 @RequestMapping("articles")
 class ArticlesController {
     @Autowired
@@ -40,13 +41,13 @@ class ArticlesController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
-    Flux<Article> getAll() {
+    @ResponseBody Flux<Article> getAll() {
         return articleService.getAllArticles();
     }
 
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
-    Mono<ResponseEntity<Article>> getById(@PathVariable("id") Integer id) {
+    @ResponseBody Mono<ResponseEntity<Article>> getById(@PathVariable("id") Integer id) {
         return  articleService.findById(id)
                 .map(u -> ResponseEntity.ok(u))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -54,10 +55,10 @@ class ArticlesController {
 
     @GetMapping(path = "/html/{id}", produces = MediaType.TEXT_HTML_VALUE)
     @ApiResponse(responseCode = "200")
-    Mono<ResponseEntity<String>> getAsHtml(@PathVariable("id") Integer id) {
+    Rendering getAsHtml(@PathVariable("id") Integer id) {
         articleService.findById(id)
                 .subscribe(article -> incrementViewCounter(id, article.getTitle()));
-        return Mono.just(ResponseEntity.ok("<p>Welcome to the jungle\n We got fun 'n' games</p>"));
+        return Rendering.view("index").build();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +66,7 @@ class ArticlesController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
             @ExampleObject(value = "{\"title\":\"Test article\", \"hashtags\":[\"test1\", \"test2\"]}")
     }))
-    Mono<ResponseEntity<URI>> create(@RequestBody Article article) {
+    @ResponseBody Mono<ResponseEntity<URI>> create(@RequestBody Article article) {
         return articleService.createArticle(article)
                 .map(a -> ResponseEntity.created(URI.create("/articles/" + a.getId()))
                         .build());
@@ -73,7 +74,7 @@ class ArticlesController {
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200")
-    Mono<ResponseEntity<Article>> updateById(@PathVariable Integer id, @RequestBody Article article) {
+    @ResponseBody Mono<ResponseEntity<Article>> updateById(@PathVariable Integer id, @RequestBody Article article) {
         return articleService.updateArticle(id, article)
                 .map(updated -> ResponseEntity.ok(updated))
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
@@ -81,7 +82,7 @@ class ArticlesController {
 
     @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204")
-    Mono<ResponseEntity<Void>> deleteById(@PathVariable Integer id) {
+    @ResponseBody Mono<ResponseEntity<Void>> deleteById(@PathVariable Integer id) {
         return articleService.deleteArticle(id)
                 .map( r -> ResponseEntity.ok().<Void>build())
                 .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -93,7 +94,7 @@ class ArticlesController {
             @ExampleObject(value = "{\"type\": \"TEXT\", \"text\": \"Lorem ipsum dolor sit amet\"}"),
             @ExampleObject(value = "{\"type\": \"SURVEY\", \"text\": \"Would you sign my petition?\"}")
     }))
-    Mono<ResponseEntity<Object>> createComponent(@PathVariable Integer id, @RequestBody Component component) {
+    @ResponseBody Mono<ResponseEntity<Object>> createComponent(@PathVariable Integer id, @RequestBody Component component) {
         Mono<Article> article = articleService.findById(id);
         return article.flatMap(a -> {
             if (component instanceof TextComponent) {

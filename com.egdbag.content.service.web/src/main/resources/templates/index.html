@@ -1,0 +1,170 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script>
+	if (!window.x) {
+		x = {};
+	}
+
+	x.Selector = {};
+	x.Selector.getSelected = function() {
+		var t = '';
+		if (window.getSelection) {
+			t = window.getSelection();
+		} else if (document.getSelection) {
+			t = document.getSelection();
+		} else if (document.selection) {
+			t = document.selection.createRange().text;
+		}
+		return t;
+	}
+
+	var pageX;
+	var pageY;
+
+	$(document).ready(function() {
+		$(document).bind("mouseup", function() {
+			var selectedText = x.Selector.getSelected();
+			if(selectedText != ''){
+				$('.comment').css({
+					'left': pageX + 5,
+					'top' : pageY + 20
+				}).fadeIn(200);
+			} else if (!$('.commentInput').is(":focus")) {
+				$('.comment').fadeOut(200);
+			}
+		});
+		$(document).on("mousedown", function(e){
+			pageX = e.pageX;
+			pageY = e.pageY;
+		});
+	});
+	</script>
+</head>
+<body>
+	<style>
+	.comment {
+		display: none;
+		list-style: none;
+		position: absolute;
+		background: #fff;
+		border-radius: 4px;
+	  box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%), 0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+		width: 250px;
+		height: 130px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		z-index: 1;
+	}
+
+	.commentInput {
+	  resize: none;
+		height: auto;
+		margin: 5px 10px 0 10px;
+		padding: 10px;
+		position: relative;
+	}
+
+	.commentInput:focus {
+	  outline: none !important;
+	}
+
+	.sendIcon {
+	  width: 1em;
+	  height: 1em;
+	  transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+	  right: 0;
+	  float: right;
+	  margin: 5px 10px 0 0;
+	  font-size: 1.25rem;
+	  color: rgba(0, 0, 0, 0.54);
+	  fill: currentColor;
+	  cursor: pointer;
+	}
+
+	.sendIcon:hover {
+	  color: rgba(0, 0, 0, 0.65);
+	}
+
+	.reaction-content {
+		position: relative;
+		width: 700px;
+		margin: 0 auto;
+	}
+
+	.reaction {
+	  display: inline-block;
+	  position: relative;
+	  text-align: center;
+	  margin: 1em 0 0 0;
+	}
+	.reaction:hover .emoji {
+	  transform: scale(1.1, 1.1);
+	  transition: all 0.1s;
+	}
+
+	.emoji {
+	  font-size: 4em;
+	  cursor: pointer;
+	}
+
+	.count {
+	  position: absolute;
+	  top: -1em;
+	  right: 0;
+	  border-radius: 1.75em;
+	  min-width: 1.25em;
+	  height: 1.75em;
+	  font: 600 0.9em "Muli", arial, sans-serif;
+	  background: #e84855;
+	  color: white;
+	  border: 0.25em solid white;
+	  padding: 0 0.25em;
+	  cursor: pointer;
+	}
+
+	.reaction-content h1 {
+	  font: 700 2em/3em "Merriweather", georgia, serif;
+	  text-align: center;
+	  color: #222;
+	}
+	</style>
+
+	<p>Vestibulum vel orci hendrerit ligula pharetra volutpat et sed dui. Phasellus vitae feugiat dolor. Mauris eleifend neque ac iaculis aliquet. Nunc malesuada nisi in dictum tristique. Vestibulum mauris eros, varius sed faucibus sed, pellentesque et nunc. Curabitur ultricies blandit urna. Pellentesque ut augue mollis, lacinia dui non, rutrum justo. Nunc et odio dapibus, blandit leo eget, aliquet urna. Etiam lorem dolor, vehicula a purus in, fermentum congue diam. Integer vel urna nec turpis posuere tempor eu lacinia purus. Praesent mattis viverra lacus bibendum fringilla. Nulla commodo posuere ante, at cursus est rhoncus quis. In iaculis viverra neque in blandit. Pellentesque eleifend arcu diam, sed sodales ligula pharetra at. Morbi ac nisl adipiscing sem interdum convallis. </p>
+
+	<div class="comment">
+		<textarea class="commentInput" cols="27" rows="4"></textarea>
+		<svg class="sendIcon" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+	</div>
+
+	<div class="reaction-content">
+		<h1>Понравилась статья?</h1>
+	<div class="reaction">
+		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot1.png">
+		<div class="count">4</div>
+	</div>
+
+	<div class="reaction">
+			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot2.png">
+		<div class="count">3</div>
+	</div>
+
+	<div class="reaction">
+		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot3.png">
+		<div class="count">57</div>
+	</div>
+
+	<div class="reaction">
+		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot4.png">
+		<div class="count">16</div>
+	</div>
+
+	<div class="reaction">
+		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot5.png">
+		<div class="count">37</div>
+	</div>
+	</div>
+
+</body>
+</html>
