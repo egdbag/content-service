@@ -5,6 +5,7 @@ import com.egdbag.content.service.core.model.survey.Answer;
 import com.egdbag.content.service.core.model.survey.Option;
 import com.egdbag.content.service.core.model.survey.Question;
 import com.egdbag.content.service.core.model.survey.SurveyComponent;
+import com.egdbag.content.service.dto.IdDto;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -15,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("components/survey")
@@ -68,10 +67,10 @@ class SurveyComponentController {
             @ExampleObject(value = "{\"type\": \"SINGLE_ANSWER\", \"text\": \"Lorem ipsum dolor sit amet\"}"),
             @ExampleObject(value = "{\"type\": \"MULTIPLE_ANSWERS\", \"text\": \"Lorem ipsum dolor sit amet\"}")
     }))
-    Mono<ResponseEntity<Object>> createQuestion(@PathVariable Integer componentId, @RequestBody Question question) {
+    Mono<ResponseEntity<IdDto>> createQuestion(@PathVariable Integer componentId, @RequestBody Question question) {
         return surveyComponentService.findById(componentId)
                 .flatMap(c -> questionService.createQuestion(question, componentId)
-                        .map(q ->ResponseEntity.created(URI.create("/questions/" + q.getId())).build()))
+                        .map(q ->ResponseEntity.ok(new IdDto(q.getId()))))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
@@ -104,10 +103,10 @@ class SurveyComponentController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
             @ExampleObject(value = "{\"text\": \"yes\"}")
     }))
-    Mono<ResponseEntity<Object>> createOption(@PathVariable Integer questionId, @RequestBody Option option) {
+    Mono<ResponseEntity<IdDto>> createOption(@PathVariable Integer questionId, @RequestBody Option option) {
         return questionService.findById(questionId)
                 .flatMap(c -> optionService.createOption(option, questionId)
-                        .map(o ->ResponseEntity.created(URI.create("/options/" + o.getId())).build()))
+                        .map(o ->ResponseEntity.ok(new IdDto(o.getId()))))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
@@ -140,7 +139,7 @@ class SurveyComponentController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, examples = {
             @ExampleObject(value = "{\"optionIds\": [ 1, 2, 3]}")
     }))
-    Mono<ResponseEntity<Object>> createAnswer(@PathVariable Integer questionId, @RequestBody Answer answer) {
+    Mono<ResponseEntity<IdDto>> createAnswer(@PathVariable Integer questionId, @RequestBody Answer answer) {
         return questionService.findById(questionId)
                 .flatMap(q -> answerService.createAnswer(answer, 1, questionId)
                         .map(a -> {
@@ -150,7 +149,7 @@ class SurveyComponentController {
                             }
                             return a;
                         })
-                        .map(o ->ResponseEntity.created(URI.create("/answers/" + o.getId())).build()))
+                        .map(o ->ResponseEntity.ok(new IdDto(o.getId()))))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 

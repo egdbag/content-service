@@ -3,6 +3,7 @@ package com.egdbag.content.service.web.controllers;
 import com.egdbag.content.service.core.interfaces.ICommentService;
 import com.egdbag.content.service.core.interfaces.ITextComponentService;
 import com.egdbag.content.service.core.model.*;
+import com.egdbag.content.service.dto.IdDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,8 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("components/text")
@@ -51,10 +50,10 @@ class TextComponentsController {
 
     @PostMapping(path = "{componentId}/comments", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "201")
-    Mono<ResponseEntity<Object>> createComponent(@PathVariable Integer componentId, @RequestBody Comment comment) {
+    Mono<ResponseEntity<IdDto>> createComponent(@PathVariable Integer componentId, @RequestBody Comment comment) {
         Mono<TextComponent> component = textComponentService.findById(componentId);
         return component.flatMap(c -> commentService.createComment(comment, 1, componentId)
-                .map(createdComment -> ResponseEntity.created(URI.create("/comments" + createdComment.getId())).build()))
+                .map(createdComment -> ResponseEntity.ok(new IdDto(createdComment.getId()))))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 

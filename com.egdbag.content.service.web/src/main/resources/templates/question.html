@@ -1,0 +1,13 @@
+<form id="form" class="form-horizontal">
+    <!-- question 3 using radio buttons -->
+    <h3 style="text-align: center;">{{text}}</h3>
+
+    {{#options}}
+    <div class="radio">
+        <label><input type="radio" value="{{id}}" name="radio">{{text}}</label>
+    </div>
+    {{/options}}
+    <div class="form-actions">
+        <button type="button" id="submitButton" class="btn btn-default">Ответить</button>
+    </div>
+</form>

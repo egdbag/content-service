@@ -1,6 +1,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script>
 	if (!window.x) {
@@ -44,6 +45,11 @@
 </head>
 <body>
 	<style>
+	body {
+		max-width: 850px;
+		margin-left: auto;
+		margin-right: auto;
+	}
 	.comment {
 		display: none;
 		list-style: none;
@@ -129,9 +135,32 @@
 	  text-align: center;
 	  color: #222;
 	}
+
+	.mainForm {
+		border:1px solid #EEEEEE;
+		border-radius:10px;
+		padding:20px;
+		background-color:white;
+	}
+
+	.form-actions {
+		text-align:center;
+	}
 	</style>
 
-	<p>Vestibulum vel orci hendrerit ligula pharetra volutpat et sed dui. Phasellus vitae feugiat dolor. Mauris eleifend neque ac iaculis aliquet. Nunc malesuada nisi in dictum tristique. Vestibulum mauris eros, varius sed faucibus sed, pellentesque et nunc. Curabitur ultricies blandit urna. Pellentesque ut augue mollis, lacinia dui non, rutrum justo. Nunc et odio dapibus, blandit leo eget, aliquet urna. Etiam lorem dolor, vehicula a purus in, fermentum congue diam. Integer vel urna nec turpis posuere tempor eu lacinia purus. Praesent mattis viverra lacus bibendum fringilla. Nulla commodo posuere ante, at cursus est rhoncus quis. In iaculis viverra neque in blandit. Pellentesque eleifend arcu diam, sed sodales ligula pharetra at. Morbi ac nisl adipiscing sem interdum convallis. </p>
+	<h1 style="text-align: center;">{{title}}</h1>
+
+	{{#textComponents}}
+	<p style="text-align: justify;" >{{text}}</p>
+	{{/textComponents}}
+
+	{{#imageComponents}}
+	<img height="350px" src="{{uri}}" style="margin: 0 auto; display: block;">
+	{{/imageComponents}}
+
+	{{#surveyComponents}}
+	  {{>survey}}
+	{{/surveyComponents}}
 
 	<div class="comment">
 		<textarea class="commentInput" cols="27" rows="4"></textarea>
@@ -140,30 +169,26 @@
 
 	<div class="reaction-content">
 		<h1>Понравилась статья?</h1>
-	<div class="reaction">
-		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot1.png">
-		<div class="count">4</div>
-	</div>
-
-	<div class="reaction">
+		<div class="reaction">
+			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot5.png">
+			<div class="count">37</div>
+		</div>
+		<div class="reaction">
+			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot4.png">
+			<div class="count">16</div>
+		</div>
+		<div class="reaction">
+			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot3.png">
+			<div class="count">57</div>
+		</div>
+		<div class="reaction">
 			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot2.png">
-		<div class="count">3</div>
-	</div>
-
-	<div class="reaction">
-		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot3.png">
-		<div class="count">57</div>
-	</div>
-
-	<div class="reaction">
-		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot4.png">
-		<div class="count">16</div>
-	</div>
-
-	<div class="reaction">
-		<img class="emoji" width="128" height="128" src="/components/image/files/sberkot5.png">
-		<div class="count">37</div>
-	</div>
+			<div class="count">3</div>
+		</div>
+		<div class="reaction">
+			<img class="emoji" width="128" height="128" src="/components/image/files/sberkot1.png">
+			<div class="count">4</div>
+		</div>
 	</div>
 
 </body>
